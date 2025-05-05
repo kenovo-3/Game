@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>The Eternal Nexus</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<script>
+const canvas = document.getElementById("scene");
+const ctx = canvas.getContext("2d");
+
+let W = canvas.width = window.innerWidth;
+let H = canvas.height = window.innerHeight;
+
+window.addEventListener("resize", () => {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  generateForest();
+});
+
+class Tree {
+  constructor(x, height, layer) {
+    this.x = x;
+    this.height = height;
+    this.layer = layer;
+    this.baseX = x;
+  }
+
+  draw(yOffset, scale, wind) {
+    const sway = Math.sin((this.baseX + Date.now() * 0.001) * 0.5) * wind;
+    ctx.fillStyle = `hsl(120, 30%, ${30 + this.layer * 10}%)`;
+    ctx.beginPath();
+    ctx.moveTo(this.x + sway, H - yOffset);
+    ctx.lineTo(this.x - 20 * scale + sway, H - this.height * scale - yOffset);
+    ctx.lineTo(this.x + 20 * scale + sway, H - this.height * scale - yOffset);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+let trees = [];
+function generateForest() {
+  trees = [];
+  for (let layer = 1; layer <= 4; layer++) {
+    for (let i = 0; i < 20; i++) {
+      const x = Math.random() * W;
+      const height = 100 + Math.random() * 150;
+      trees.push(new Tree(x, height, layer));
+    }
+  }
+}
+generateForest();
+
+// Fog
+const fogLayers = Array.from({ length: 3 }).map((_, i) => ({
+  y: Math.random() * H,
+  speed: 0.2 + i * 0.1,
+  alpha: 0.05 + i * 0.05
+}));
+
+// Sun rays
+function drawLightRays() {
+  for (let i = 0; i < 5; i++) {
+    const x = W / 2 + Math.sin(Date.now() * 0.0003 + i) * 200;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x + 100, H);
+    ctx.lineWidth = 100;
+    ctx.strokeStyle = "rgba(255,255,200,0.02)";
+    ctx.stroke();
+  }
+}
+
+let cameraY = 0;
+let cameraZoom = 1;
+let time = 0;
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  time += 0.01;
+
+  // Camera motion
+  cameraY = Math.sin(time) * 100 + time * 30;
+  cameraZoom = Math.max(0.5, 1 - time * 0.01);
+
+  // Background gradient
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, "#0c0c0c");
+  grad.addColorStop(1, "#1a3d1a");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Sun rays
+  drawLightRays();
+
+  // Forest
+  trees.forEach(tree => {
+    const scale = cameraZoom * (1 + tree.layer * 0.1);
+    tree.draw(cameraY * (tree.layer * 0.25), scale, 1 + tree.layer * 0.3);
+  });
+
+  // Fog
+  fogLayers.forEach(fog => {
+    fog.y += fog.speed;
+    if (fog.y > H) fog.y = -H;
+    ctx.fillStyle = `rgba(255,255,255,${fog.alpha})`;
+    ctx.fillRect(0, fog.y, W, H / 3);
+  });
+
+  // Title Reveal
+  if (time > 8) {
+    ctx.font = `bold ${Math.min(W, H) / 12}px serif`;
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.textAlign = "center";
+    ctx.fillText("The Eternal Nexus", W / 2, H / 2);
+  }
+
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>The Eternal Nexus</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<script>
+const canvas = document.getElementById("scene");
+const ctx = canvas.getContext("2d");
+
+let W = canvas.width = window.innerWidth;
+let H = canvas.height = window.innerHeight;
+
+window.addEventListener("resize", () => {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  generateForest();
+});
+
+class Tree {
+  constructor(x, height, layer) {
+    this.x = x;
+    this.height = height;
+    this.layer = layer;
+    this.baseX = x;
+  }
+
+  draw(yOffset, scale, wind) {
+    const sway = Math.sin((this.baseX + Date.now() * 0.001) * 0.5) * wind;
+    ctx.fillStyle = `hsl(120, 30%, ${30 + this.layer * 10}%)`;
+    ctx.beginPath();
+    ctx.moveTo(this.x + sway, H - yOffset);
+    ctx.lineTo(this.x - 20 * scale + sway, H - this.height * scale - yOffset);
+    ctx.lineTo(this.x + 20 * scale + sway, H - this.height * scale - yOffset);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+let trees = [];
+function generateForest() {
+  trees = [];
+  for (let layer = 1; layer <= 4; layer++) {
+    for (let i = 0; i < 20; i++) {
+      const x = Math.random() * W;
+      const height = 100 + Math.random() * 150;
+      trees.push(new Tree(x, height, layer));
+    }
+  }
+}
+generateForest();
+
+// Fog
+const fogLayers = Array.from({ length: 3 }).map((_, i) => ({
+  y: Math.random() * H,
+  speed: 0.2 + i * 0.1,
+  alpha: 0.05 + i * 0.05
+}));
+
+// Sun rays
+function drawLightRays() {
+  for (let i = 0; i < 5; i++) {
+    const x = W / 2 + Math.sin(Date.now() * 0.0003 + i) * 200;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x + 100, H);
+    ctx.lineWidth = 100;
+    ctx.strokeStyle = "rgba(255,255,200,0.02)";
+    ctx.stroke();
+  }
+}
+
+let cameraY = 0;
+let cameraZoom = 1;
+let time = 0;
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  time += 0.01;
+
+  // Camera motion
+  cameraY = Math.sin(time) * 100 + time * 30;
+  cameraZoom = Math.max(0.5, 1 - time * 0.01);
+
+  // Background gradient
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, "#0c0c0c");
+  grad.addColorStop(1, "#1a3d1a");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Sun rays
+  drawLightRays();
+
+  // Forest
+  trees.forEach(tree => {
+    const scale = cameraZoom * (1 + tree.layer * 0.1);
+    tree.draw(cameraY * (tree.layer * 0.25), scale, 1 + tree.layer * 0.3);
+  });
+
+  // Fog
+  fogLayers.forEach(fog => {
+    fog.y += fog.speed;
+    if (fog.y > H) fog.y = -H;
+    ctx.fillStyle = `rgba(255,255,255,${fog.alpha})`;
+    ctx.fillRect(0, fog.y, W, H / 3);
+  });
+
+  // Title Reveal
+  if (time > 8) {
+    ctx.font = `bold ${Math.min(W, H) / 12}px serif`;
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.textAlign = "center";
+    ctx.fillText("The Eternal Nexus", W / 2, H / 2);
+  }
+
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>
